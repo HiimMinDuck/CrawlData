@@ -483,8 +483,7 @@ def upData_DXT(details, id):
     val = (value4,)
     cur.execute(sql, val)
     cur.fetchone()
-    #()
-    if cur.fetchone() is None:
+    if cur.fetchone() is None or cur.fetchone() == ():
         myresult = ""
     else:
         myresult = cur.fetchone()[0]
@@ -499,7 +498,7 @@ def upData_DXT(details, id):
     val = (value6,)
     cur.execute(sql, val)
     cur.fetchone()
-    if cur.fetchone() is None:
+    if cur.fetchone() is None or cur.fetchone() == ():
         myresult = ""
     else: 
         myresult = cur.fetchone()[0]
