@@ -16,13 +16,16 @@ def upData(details, news_id, result):
             sql = "SELECT * FROM pccc_app_job_company_profiles WHERE company_name = %s"
             val = (contractor_name,)
             cur.execute(sql, val)
-            a = cur.fetchone()
+            a = cur.fetchall()
+
             number_dkkd = ""
             subject_id = 0
-            if cur.fetchone() != None:
-                for i in cur.fetchone():
-                    number_dkkd = str(a[15])
-                    subject_id = str(a[0])
+
+            if a != None:
+                if a != []:
+                    number_dkkd = str(a[0][15])
+                    subject_id = str(a[0][0])
+
             bid_price = str('{:,}'.format(int(i[2])).replace(',', '.')) + 'VND'
             dis_rate = ((int(i[2]) - int(i[3]))/int(i[2]))*100
             bid_price_after_dis = str('{:,}'.format(int(i[2])).replace(',', '.'))+ 'VND'

@@ -28,7 +28,10 @@ def downFileAndUpLoad(code):
         if not os.path.isdir(folder_pathz):
             os.mkdir(folder_pathz)
         # URL of the file to download
-
+        folder_pathy = './download/'
+        if not os.path.isdir(folder_pathy):
+            os.mkdir(folder_pathy)
+            
         remotefile = urlopen(url)
         contentdisposition = remotefile.info()['Content-Disposition']
         _, params = cgi.parse_header(contentdisposition)

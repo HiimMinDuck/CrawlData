@@ -22,6 +22,7 @@ def upDataDB(details, news_id):
         value_bd_tt = str(company[6])
         e_bd_dt = str(company[7])
         duration_contract = ''
+
         for i in company[8]:
             if i.isdecimal():
                 continue
@@ -30,6 +31,7 @@ def upDataDB(details, news_id):
                     duration_contract = company[8].replace("D", " ngày")
                 elif i == "M":
                     duration_contract = company[8].replace("M", " tháng")
+
         subject_type = "App\Models\JobCompanyProfile"
 
         conn = connectdb.connect()
@@ -38,18 +40,19 @@ def upDataDB(details, news_id):
         val = (contractor_name,)
         cur.execute(sql, val)
         a = cur.fetchone()
-        cur.fetchone()
+
         number_dkkd = ""
         subject_id = 0
 
         if a != None:
-            for i in a:
-                number_dkkd = str(a[15])
-                subject_id = str(a[0])
+            if a != []:
+                for i in a:
+                    number_dkkd = str(a[15])
+                    subject_id = str(a[0])
+
         # vì data test chưa có app job company profile nên subject id đặt bằng 0
-        data = (news_id, number_dkkd, contractor_name, bid_price, dis_rate, bid_price_after_dis, e_hsdxtc, value_bd_tt, e_bd_dt, duration_contract, time(str(datetime.now())), time(str(datetime.now())), subject_id,subject_type, )
-        sql = "INSERT INTO pccc_app_bidding_open_result_bid_open_complete(news_id, number_dkkd, contractor_name, bid_price, discount_rate, bid_price_after_discount, effect_hsdt, bid_guarantee, effect_bddt, duration_of_contract, created_at, updated_at, subject_id, subject_type)" \
-              f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        data = (news_id, number_dkkd, contractor_name, bid_price, dis_rate, bid_price_after_dis, e_hsdxtc, value_bd_tt, e_bd_dt, duration_contract, time(str(datetime.now())), time(str(datetime.now())), subject_id,subject_type)
+        sql = "INSERT INTO pccc_app_bidding_open_result_bid_open_complete(news_id, number_dkkd, contractor_name, bid_price, discount_rate, bid_price_after_discount, effect_hsdt, bid_guarantee, effect_bddt, duration_of_contract, created_at, updated_at, subject_id, subject_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
         cur.execute(sql, data)
         conn.commit()
 

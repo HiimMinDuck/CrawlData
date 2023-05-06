@@ -41,12 +41,13 @@ all_objects = muppy.get_objects()
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-yesterday = datetime.now() - timedelta(days=4)
+#yesterday = datetime.now() - timedelta(days=1)
 
-yesterday_str = yesterday.strftime('%Y-%m-%d')
+#yesterday_str = yesterday.strftime('%Y-%m-%d')
 
-startDay = str(yesterday_str)
-endDay = str(yesterday_str)
+
+startDay = str(input('a: '))
+endDay = str(input('b: '))
 
 global now
 time_now = datetime.now()
@@ -55,7 +56,7 @@ now = formatted_now + ' 00:00:00'
 
 areaType1 = []
 
-with open('./areaType1.csv', newline='\n', encoding='utf-8') as csvfile:
+with open("./areaType1.csv", newline='\n', encoding='utf-8') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         if row == []:
@@ -280,7 +281,7 @@ def update_pccc_news_files(media_id, file_name_for_user, url, code_file, code):
     if myresult is not None:
         if myresult != []:
             news_files_id = myresult[0]
-            sql = 'UPDATE pccc_app_bidding_news_files SET file_name = %s , link_muasamcong = %s , media_id=%s , updated_at = NOW() WHERE `id` = %s AND created_at >= %s' 
+            sql = 'UPDATE pccc_app_bidding_news_files SET file_name = %s , link_muasamcong = %s , media_id=%s , updated_at = NOW() WHERE `id` = %s ;' 
             val = (file_name_for_user, url, media_id, news_files_id,now)
             cur.execute(sql, val)
             conn.commit()
@@ -797,7 +798,7 @@ def CrawlDetailNhaThau(code, details, session1, codes, folder_path1):
             job_company_profile_id = cur.lastrowid
 
         else:
-            sql = "UPDATE pccc_app_job_company_profiles SET contractor = 1, updated_at = NOW() WHERE company_name = %s"
+            sql = "UPDATE pccc_app_job_company_profiles SET contractor = 1 , updated_at = NOW() WHERE company_name = %s"
             val = (company_name,)
             cur.execute(sql, val)
             conn.commit()
@@ -2085,12 +2086,12 @@ def CrawlDetail_TT_KHLCNT(code, details, session1, codes, folder_path1):
                         review['planType'],
                         review['decisionFileName'],
                         link])
-
-        upData_KHLCNT(details=details)
-
+        
         with open('' + folder_path1 + '/KHLCNT.csv', 'a', encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(details)
+
+        upData_KHLCNT(details=details)
         details.clear()
 
 
@@ -2163,13 +2164,15 @@ def upData_KHLCNT(details):
     val = (ten_chu_dau_tu,)
     cur.execute(sql, val)
     myresult = cur.fetchone()
-    if myresult:
-        subject_id_1 = myresult[0]
-        subject_id_1 = str(subject_id_1)
-        subject_type_1 = 'App\Models\JobCompanyProfile'
-    else:
-        subject_id_1 = None
-        subject_type_1 = None
+
+    subject_id_1 = None
+    subject_type_1 = None
+
+    if myresult is not None:
+        if myresult != []:
+            subject_id_1 = myresult[0]
+            subject_id_1 = str(subject_id_1)
+            subject_type_1 = 'App\Models\JobCompanyProfile'
     
     sql = "SELECT * FROM pccc_app_bidding_news WHERE type_id = 1 AND bid_number = %s AND bid_turn_no = %s AND created_at >= %s"
     val = (bid_number, bid_turn_no, now)
@@ -3187,6 +3190,10 @@ def CrawlDetail_TT_TBMT_CDT(code, details, session1, codes, folder_path1):
                         decisionFileName,#36
                         listFileDinhKemHSMT,
                         check_listHH])#37
+        
+        with open('' + folder_path1 + '/TBMT_CDT.csv', 'a', encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(details)
 
         bidType = upABN_db.bid_type(details[10])
         bidMethod = upABN_db.bid_method(details[16])
@@ -3213,9 +3220,7 @@ def CrawlDetail_TT_TBMT_CDT(code, details, session1, codes, folder_path1):
                     result = myresult[0]
                     upData(details, result, link1)
                     
-        with open('' + folder_path1 + '/TBMT_CDT.csv', 'a', encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(details)
+        
         details.clear()
 
 
@@ -3819,16 +3824,12 @@ def CrawlMaTinTucDongThau(pageNumber, codes, details, session1, folder_path1):
 
             if code[4] == 'DXT':
                 if code[6] == 1:
-                    if code[7] == 'TV':
-                        if code[3] == 'notify-contractor-step-2-kqmt':
-                            CrawlDetail_DT_DXT_TV_KQMT(code=code[0],details=details,session1=session1,codes=code,folder_path1=folder_path1,notify_no=code[1],mode='kqmt')
-                            #Code DXT KQMT
-                        elif code[3] == 'notify-contractor-step-3-dsntdkt':
-                            CrawlDetail_DT_DXT_TV_DSNTDKT(code=code[0],details=details,session1=session1,codes=code,folder_path1=folder_path1,notify_no=code[1],mode = 'dsntdkt')
-                            #Code DXT DSNTDXKT
-                        else:
-                            print(code)
-                            #Tim con code nao khac khong
+                    if code[3] == 'notify-contractor-step-2-kqmt':
+                        CrawlDetail_DT_DXT_TV_KQMT(code=code[0],details=details,session1=session1,codes=code,folder_path1=folder_path1,notify_no=code[1],mode='kqmt')
+                        #Code DXT KQMT
+                    elif code[3] == 'notify-contractor-step-3-dsntdkt':
+                        CrawlDetail_DT_DXT_TV_DSNTDKT(code=code[0],details=details,session1=session1,codes=code,folder_path1=folder_path1,notify_no=code[1],mode = 'dsntdkt')
+                        #Code DXT DSNTDXKT
                     else:
                         CrawlDetail_DT_DXT(code=code[0],details=details,session1=session1,codes=code,folder_path1=folder_path1,notify_no=code[1],mode='else')
 
@@ -4316,6 +4317,7 @@ def CrawlDetail_DT_DXT(code, details, session1, codes, folder_path1, notify_no,m
         elif review['investField'] == "XL":
             review['investField'] = "Xây lắp"
         details = []
+
         details.extend([
             review['notifyNo'],#0
             review['publicDate'],#1
@@ -4365,20 +4367,22 @@ def CrawlDetail_DT_DXT(code, details, session1, codes, folder_path1, notify_no,m
 
         if upABN_db.ktTrungDL(review['notifyNo'], review["notifyVersion"]) == None:
 
-            if details[10] == 'Tư vấn' or details[10] == 'TV':
+            if details[14] == 'Một giai đoạn hai túi hồ sơ' or details[14] == '1_HTHS':
 
                 if mode == 'dsntdkt':
 
                     news_id = upABN_db.upDataDB_1_DXT_TV(7, bidType, bidMethod, 1, crea_at, crea_at, review['notifyNo'], review["notifyVersion"])
 
                     open_result_status = 'complete_gd_hskt'
-                    upABN_db.upDataDB_DXT_TV(tim_open, news_id,open_result_status)
+
+                    upABN_db.upDataDB_DXT_TV(tim_open, news_id, open_result_status)
                 
                 elif mode =='kqmt':
 
                     news_id = upABN_db.upDataDB_1_DXT_TV(7, bidType, bidMethod, 1, crea_at, crea_at, review['notifyNo'], review["notifyVersion"])
                     
                     open_result_status = 'open_hskt_complete'
+
                     upABN_db.upDataDB_DXT_TV(tim_open, news_id,open_result_status)
 
                     upABNDetail_db.upData_DXT_TV(details, news_id)
@@ -6003,6 +6007,7 @@ def CrawlDetail_DT_CNTTT(code, details, session1, codes, folder_path1, code1, co
             link2 = 0
         if review1['bidPrice'] is None:
             review1['bidPrice'] = 0
+
         details = []   
         details.extend([review1['notifyNo'],
                         review1['publicDate'],
@@ -6045,6 +6050,11 @@ def CrawlDetail_DT_CNTTT(code, details, session1, codes, folder_path1, code1, co
                         decisionCNTTT,
                         listLienDanh,
                         listHangHoa])
+        
+        with open('' + folder_path1 + '/CNTTT.csv', 'a', encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(details)
+            
         bidType = upABN_db.bid_type(details[10])
         bidMethod = upABN_db.bid_method(details[16])
         crea_at = upABN_db.timeUpd()
@@ -6052,21 +6062,23 @@ def CrawlDetail_DT_CNTTT(code, details, session1, codes, folder_path1, code1, co
         time_post = upABN_db.time_post(details[1])
         date_app = upABN_db.date_app2(decisionDate)
         news_id = 0
+
         if upABN_db.ktTrungDL(review1['notifyNo'], review1["notifyVersion"]) == None:
             news_id = upABN_db.upDataDB(8, bidType, bidMethod, 1, crea_at, crea_at, review1['notifyNo'],
                                         review1["notifyVersion"],
                                         tim_close, time_post, date_app)
+            
             upABNDetail_db.upData_CNTTT(details, news_id)
+
             upABO_result_complete_gd_hsdt.upData(details, news_id, 1)
-            # print(f"ListHH ---- {listHangHoa}")
+            
             if listHangHoa != []:
                 upABRGoods_db.upData_CNTTT(listHangHoa, news_id)
+
             up_ABN_joint_ventures_db.upData_CNTTT(listLienDanh, news_id, 8)
             
 
-        with open('' + folder_path1 + '/CNTTT.csv', 'a', encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(details)
+        
         details.clear()
         return
 

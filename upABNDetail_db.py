@@ -305,19 +305,31 @@ def upData(details, id1):
 
     conn = connectdb.connect()
     cur = conn.cursor()
-    sql = "SELECT * FROM pccc_app_job_company_profiles WHERE company_name = %s"
-    val = (value8,)
-    cur.execute(sql,val)
-    myresult = cur.fetchone()
+    subject_id_1 = None
+    subject_type_1 = None
 
+    sql = "SELECT `id` FROM pccc_app_job_company_profiles WHERE company_name = %s"
+    val = (value8,)
+    cur.execute(sql, val)
+    myresult = cur.fetchone()
     if myresult is not None:
         if myresult != []:
             subject_id_1 = myresult[0]
             subject_id_1 = str(subject_id_1)
             subject_type_1 = 'App\Models\JobCompanyProfile'
-    else:
-        subject_id_1 = None
-        subject_type_1 = None
+        
+
+    #sql = "SELECT * FROM pccc_app_job_company_profiles WHERE company_name = %s"
+    #val = (value8,)
+    #cur.execute(sql,val)
+    #myresult = cur.fetchone()
+
+    #if myresult is not None:
+    #    if myresult != []:
+    #        subject_id_1 = myresult[0]
+    #        subject_id_1 = str(subject_id_1)
+    #        subject_type_1 = 'App\Models\JobCompanyProfile'
+        
 
     records = [
         (key1, sub_title1, titles1, value1, id1),
@@ -355,6 +367,24 @@ def upData(details, id1):
     sql = "INSERT INTO pccc_app_bidding_news_details(`key`, sub_title, title, value, news_id, type_id, created_at, updated_at) " \
           f"VALUES (%s, %s, %s, %s, %s, 3, NOW(), NOW());"
     cur.executemany(sql, records)
+    conn.commit()
+
+    sql = "SELECT `id` FROM pccc_app_bidding_news_details WHERE `key` = 'ben-moi-thau' AND news_id = %s"
+    val = (id1,)
+    cur.execute(sql,val)
+    myresult = cur.fetchone()
+    
+    id_news_details  = None
+
+    if myresult is not None:
+        if myresult != []:
+            id_news_details = myresult[0]
+            id_news_details = str(id_news_details)
+        
+    
+    sql = "UPDATE pccc_app_bidding_news_details SET subject_id = %s , subject_type = %s  WHERE `id` = %s"
+    val = (subject_id_1, subject_type_1, id_news_details)
+    cur.execute(sql,val)
     conn.commit()
 
 def upData_DXT(details, id):
@@ -449,10 +479,11 @@ def upData_DXT(details, id):
     conn.commit()
 
 
-    sql = "SELECT * FROM pccc_app_job_company_profiles WHERE company_name = %s"
+    sql = "SELECT `id` FROM pccc_app_job_company_profiles WHERE company_name = %s"
     val = (value4,)
     cur.execute(sql, val)
     cur.fetchone()
+    #()
     if cur.fetchone() is None:
         myresult = ""
     else:
@@ -460,7 +491,7 @@ def upData_DXT(details, id):
 
     if myresult != "":
        
-        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Chủ đầu tư' AND news_id = '{id}' AND created_at >= '{now}';"
+        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}' , subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Chủ đầu tư' AND news_id = '{id}' ;"
         cur.execute(sql)
         conn.commit()
 
@@ -470,11 +501,11 @@ def upData_DXT(details, id):
     cur.fetchone()
     if cur.fetchone() is None:
         myresult = ""
-    else: myresult = cur.fetchone()[0]
+    else: 
+        myresult = cur.fetchone()[0]
 
     if myresult != "":
-        
-        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Bên mời thầu' AND news_id = '{id}' AND created_at >= '{now}';"
+        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Bên mời thầu' AND news_id = '{id}' ;"
         cur.execute(sql)
         conn.commit()
 
@@ -583,21 +614,20 @@ def upData_DXT_TV(details, id):
     cur.executemany(sql, records)
     conn.commit()
 
-
-    sql = "SELECT * FROM pccc_app_job_company_profiles WHERE company_name = %s"
+    conn = connectdb.connect()
+    cur = conn.cursor()
+    sql = "SELECT `id` FROM pccc_app_job_company_profiles WHERE company_name = %s"
     val = (value4,)
     cur.execute(sql, val)
-    cur.fetchone()
-    if cur.fetchone() is None:
-        myresult = ""
-    else:
-        myresult = cur.fetchone()[0]
-
-    if myresult != "":
-        
-        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Tên bên mời thầu' AND news_id = '{id}' AND created_at >= '{now}';"
-        cur.execute(sql)
-        conn.commit()
+    myresult = cur.fetchone()
+    if myresult is not None:
+        if myresult != []:
+            conn = connectdb.connect()
+            cur = conn.cursor()
+            myresult_id = myresult[0]
+            sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult_id}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Tên bên mời thầu' AND news_id = '{id}' ;"
+            cur.execute(sql)
+            conn.commit()
 
 
 def upData_CNTTT(details, id1):
@@ -729,13 +759,17 @@ def upData_CNTTT(details, id1):
     value11 = ''
     if a != None:
         value11 = str(a[15])
-
+    value12 = ''
+    value13 = ''
+    value16 = ''
     for i in details[35]:
         if details[36][0][1] != i[1]:
             continue
         value12 = str('{:,}'.format(int(i[2])).replace(',', '.')) + 'VND'
         value13 = str((i[3]))
         value16 = str('{:,}'.format(int(i[4])).replace(',', '.')) + 'VND'
+
+    
     value14 = ''
     value15 = ''
     value17 = str('{:,}'.format(int(details[36][0][3])).replace(',', '.')) + 'VND'
@@ -772,63 +806,19 @@ def upData_CNTTT(details, id1):
     cur.executemany(sql, records)
     conn.commit()
 
-    sql = "SELECT * FROM pccc_app_job_company_profiles WHERE company_name = %s"
+    sql = "SELECT `id` FROM pccc_app_job_company_profiles WHERE company_name = %s"
     val = (value10,)
     cur.execute(sql, val)
     a = cur.fetchone()
-    if a is None:
-        myresult = ""
-    else:
-        myresult = a[0]
-
-    if myresult != "":
-        
-        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Chủ đầu tư' AND news_id = '{id}' AND created_at >= '{now}';"
-        cur.execute(sql)
-        conn.commit()
+    if a is not None:
+        if a != []:
+            myresult = a[0]
+            sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Chủ đầu tư' AND news_id = '{id}' ;"
+            cur.execute(sql)
+            conn.commit()
 
 
-details = ['IB2300047604',
-           '2023-03-23T11:08:38.406',
-           '00',
-           'PL2300036765',
-           'Chi thường xuyên',
-           "Thu gom rác, vận chuyển rác thải sinh hoạt đến điểm tập kết và xử lý rác tạm thời trên địa bàn xã Bàn Giản ( từ ngày 01/04/2023 đến ngày 31/12/2023)",
-           "Thu gom rác, vận chuyển rác thải sinh hoạt đến điểm tập kết và xử lý rác tạm thời trên địa bàn xã Bàn Giản ( từ ngày 01/04/2023 đến ngày 31/12/2023)",
-           "UBND xã Bàn Giản, huyện Lập Thạch",
-           "UBND xã Bàn Giản, huyện Lập Thạch",
-           'Nguồn vốn sự nghiệp môi trường và các nguồn huy động hợp pháp khác',
-           'Phi tư vấn',
-           'Chào hàng cạnh tranh',
-           'TG',
-           'Trong nước',
-           'Một giai đoạn một túi hồ sơ',
-           '272D',
-           'Qua mạng',
-           'https://muasamcong.mpi.gov.vn',
-           "220,000 VND",
-           'https://muasamcong.mpi.gov.vn',
-           "Huyện Lập Thạch, Tỉnh Vĩnh Phúc",
-           '2023-03-30T07:30:00',
-           '2023-03-30T07:30:00',
-           'https://muasamcong.mpi.gov.vn',
-           '60D',
-           5000000,
-           352052000,
-           'Cam kết',
-           '40/QĐ-UBND',
-           '2023-03-15T17:00:00.000+0000',
-           'UBND xã Bàn Giản',
-           "('http://localhost:1234/api/download/file/browser/public?fileId=a51c75e6-4f32-489a-ae1b-a0501eb40e62',)",
-           "('https://muasamcong.mpi.gov.vn/egp/contractorfe/viewer?formCode=ALL&id=effad1d2-0857-4ac9-8db5-38f2282c0394',)",
-           1,
-           '2023-03-30T07:40:52',
-           "[['vn2500667324', 'HỢP TÁC XÃ DỊCH VỤ TỔNG HỢP BÀN GIẢN', 351164000, 0, 351164000, 60, 5000000, 90, '272D']]",
-           "[['vn2500667324', 'HỢP TÁC XÃ DỊCH VỤ TỔNG HỢP BÀN GIẢN', 351164000, 351164000, '272D']]",
-           "['effad1d2-0857-4ac9-8db5-38f2282c0394', 'IB2300047604', 'es-notify-contractor', 'notify-contractor-step-4-kqlcnt', 'CNTTT', 'ba7b1d27-657e-43f1-9589-20b73cb68cf1', 1, 'PTV', '00']",
-           '2023-03-31T23:59:59',
-           [None],
-           []]
+
 
 def upData_HSMT(details, id1):
     sub_title = "Hồ sơ mời sơ tuyển gói hàng hóa"
@@ -998,7 +988,7 @@ def upData_HSMT(details, id1):
 
     if myresult != "":
         
-        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Chủ đầu tư' AND news_id = '{id}' AND created_at >= '{now}';"
+        sql = f"UPDATE pccc_app_bidding_news_details SET subject_id = '{myresult}', subject_type = 'App\Models\JobCompanyProfile' WHERE `title` = 'Chủ đầu tư' AND news_id = '{id}' ;"
         cur.execute(sql)
         conn.commit()
 # upData_CNTTT(details, 1841085)

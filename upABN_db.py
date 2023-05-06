@@ -99,16 +99,16 @@ def upDataDB_DXT(bid_open_tim, news_id):
     
     conn = connectdb.connect()
     mycursor = conn.cursor()
-    sql = f"UPDATE pccc_app_bidding_news SET bid_opening_time = '{bid_open_tim}', open_result_status = 'bid_open_complete' WHERE `id` = '{news_id}' AND created_at >= '{now}';"
+    sql = f"UPDATE pccc_app_bidding_news SET bid_opening_time = '{bid_open_tim}' , open_result_status = 'bid_open_complete' WHERE `id` = '{news_id}' ;"
     mycursor.execute(sql)
     conn.commit()
 
 def upDataDB_1_DXT(type_id, bid_type, bid_method, aujusted_limited, created_at, updated_at, bid_number, bid_turn_no):
     conn = connectdb.connect()
     mycursor = conn.cursor()
-    sql = "INSERT INTO pccc_app_bidding_news (type_id, bid_type, bid_method, aujusted_limited, created_at, updated_at, bid_number, bid_turn_no) " \
-          f"VALUES ('{type_id}', '{bid_type}', '{bid_method}', '{aujusted_limited}', '{created_at}','{updated_at}', '{bid_number}', '{bid_turn_no}');"
-    mycursor.execute(sql)
+    sql = "INSERT INTO pccc_app_bidding_news (type_id, bid_type, bid_method, aujusted_limited, created_at, updated_at, bid_number, bid_turn_no) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    values = (type_id, bid_type, bid_method, aujusted_limited, created_at, updated_at, bid_number, bid_turn_no)
+    mycursor.execute(sql, values)
     conn.commit()
     news_id = mycursor.lastrowid
     news_id = int(news_id)
@@ -129,7 +129,7 @@ def upDataDB_DXT_TV(bid_open_tim, news_id,open_result_status):
    
     conn = connectdb.connect()
     mycursor = conn.cursor()
-    sql = f"UPDATE pccc_app_bidding_news SET bid_opening_time = '{bid_open_tim}', open_result_status = '{open_result_status}' WHERE `id` = '{news_id}' AND created_at >= '{now}';"
+    sql = f"UPDATE pccc_app_bidding_news SET bid_opening_time = '{bid_open_tim}', open_result_status = '{open_result_status}' WHERE `id` = '{news_id}' ;"
     mycursor.execute(sql)
     conn.commit()
 
